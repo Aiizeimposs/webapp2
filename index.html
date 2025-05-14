@@ -2,28 +2,62 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>WebApp2</title>
+  <title>ระบบแสดงผลการมาเรียน</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background-color: #fdf6f6; }
+    label, select, input { margin: 5px 0; display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 10px; border: 1px solid #ddd; }
+    th { background-color: #f2f2f2; }
+  </style>
 </head>
 <body>
-  <h1>ข้อมูลจาก Apps Script</h1>
-  <div id="result">กำลังโหลด...</div>
+
+  <h2>ตรวจสอบการมาเรียน</h2>
+
+  <label for="className">ชั้นเรียน:</label>
+  <select id="className">
+    <option value="ม.1/1">ม.1/1</option>
+    <option value="ม.1/2">ม.1/2</option>
+    <option value="ม.1/3">ม.1/3</option>
+    <option value="ม.2/1">ม.2/1</option>
+    <option value="ม.2/2">ม.2/2</option>
+    <option value="ม.2/3">ม.2/3</option>
+  </select>
+
+  <label for="date">วันที่ (YYYY-MM-DD):</label>
+  <input type="date" id="date">
+
+  <button onclick="loadAttendance()">แสดงข้อมูล</button>
+
+  <div id="result" style="margin-top: 20px;"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const scriptUrl = urlParams.get('apps');
+    function loadAttendance() {
+      const className = document.getElementById('className').value;
+      const dateText = document.getElementById('date').value;
 
-    if (scriptUrl) {
-      fetch(scriptUrl)
+      if (!dateText) {
+        document.getElementById('result').innerHTML = '⚠️ กรุณาเลือกวันที่';
+        return;
+      }
+
+      const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
+
+      fetch(url)
         .then(res => res.json())
         .then(data => {
-          document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+          if (data.error) {
+            document.getElementById('result').innerHTML = `❌ ${data.error}`;
+          } else {
+            document.getElementById('result').innerHTML = data.html;
+          }
         })
         .catch(err => {
-          document.getElementById('result').innerHTML = 'เกิดข้อผิดพลาด: ' + err.message;
+          document.getElementById('result').innerHTML = '🚫 เกิดข้อผิดพลาด: ' + err.message;
         });
-    } else {
-      document.getElementById('result').innerHTML = 'ไม่พบพารามิเตอร์ apps';
     }
   </script>
+
 </body>
 </html>
