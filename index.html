@@ -96,26 +96,47 @@
     <div id="result"></div>
 
     <script>
-      function fetchData() {
-        const date = document.getElementById("date").value;
-        const className = document.getElementById("class").value;
-        if (!date || !className) {
-          alert("กรุณาเลือกวันที่และชั้นเรียน");
-          return;
-        }
+      ffunction fetchData() {
+  const date = document.getElementById("date").value;
+  const className = document.getElementById("class").value;
+  if (!date || !className) {
+    alert("กรุณาเลือกวันที่และชั้นเรียน");
+    return;
+  }
 
-        const [yyyy, mm, dd] = date.split("-");
-        const buddhistYear = parseInt(yyyy) + 543;
-        const formattedDate = `${dd}/${mm}/${buddhistYear}`;
+  const [yyyy, mm, dd] = date.split("-");
+  const buddhistYear = parseInt(yyyy) + 543;
+  const formattedDate = `${dd}/${mm}/${buddhistYear}`;
 
-        // ส่งคำขอไปยัง Google Apps Script Web App
-        fetch(`https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?date=${formattedDate}&class=${className}`)
-          .then(response => response.text())
-          .then(data => {
-            document.getElementById("result").innerHTML = data;
-          })
-          .catch(error => console.error('Error:', error));
-      }
+  // ส่งคำขอไปยัง Google Apps Script Web App
+  fetch(`https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?date=${formattedDate}&class=${className}`)
+    .then(response => response.json()) // รับข้อมูลในรูปแบบ JSON
+    .then(data => {
+      // สร้างตารางเพื่อแสดงผลข้อมูลที่ดึงมา
+      displayResult(data);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function displayResult(data) {
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = ""; // เคลียร์ผลลัพธ์เก่า
+
+  if (data.length === 0) {
+    resultDiv.innerHTML = "<p>ไม่มีข้อมูลการมาเรียนในวันที่เลือก</p>";
+    return;
+  }
+
+  // สร้างตาราง
+  let tableHTML = `<table><thead><tr><th>ชื่อ</th><th>สถานะ</th></tr></thead><tbody>`;
+  data.forEach(item => {
+    tableHTML += `<tr><td>${item.name}</td><td>${item.status}</td></tr>`;
+  });
+  tableHTML += `</tbody></table>`;
+
+  resultDiv.innerHTML = tableHTML;
+}
+
     </script>
   </body>
 </html>
