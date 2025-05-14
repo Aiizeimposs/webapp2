@@ -54,7 +54,7 @@
   // ไม่ต้องแปลงวันที่เป็นไทยแล้ว ส่งเป็น YYYY-MM-DD ไปเลย
   const dateText = dateInput;
 
-  const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&action=attendance&class=<span class="math-inline">\{encodeURIComponent\(className\)\}&date\=</span>{encodeURIComponent(dateText)}`;
+  const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&action=attendance&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
 
   fetch(url)
     .then(response => {
