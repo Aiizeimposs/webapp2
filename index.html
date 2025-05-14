@@ -32,32 +32,44 @@
 
   <div id="result" style="margin-top: 20px;"></div>
 
+ 
   <script>
-    function loadAttendance() {
-      const className = document.getElementById('className').value;
-      const dateText = document.getElementById('date').value;
+  function formatDateToThai(dateStr) {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const buddhistYear = date.getFullYear() + 543; // แปลงเป็น พ.ศ.
+    return `${day}/${month}/${buddhistYear}`;
+  }
 
-      if (!dateText) {
-        document.getElementById('result').innerHTML = '⚠️ กรุณาเลือกวันที่';
-        return;
-      }
+  function loadAttendance() {
+    const className = document.getElementById('className').value;
+    const dateInput = document.getElementById('date').value;
 
-      const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
-
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            document.getElementById('result').innerHTML = `❌ ${data.error}`;
-          } else {
-            document.getElementById('result').innerHTML = data.html;
-          }
-        })
-        .catch(err => {
-          document.getElementById('result').innerHTML = '🚫 เกิดข้อผิดพลาด: ' + err.message;
-        });
+    if (!dateInput) {
+      document.getElementById('result').innerHTML = '⚠️ กรุณาเลือกวันที่';
+      return;
     }
-  </script>
+
+    const dateText = formatDateToThai(dateInput); // แปลงเป็น 13/05/2568
+
+    const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById('result').innerHTML = `❌ ${data.error}`;
+        } else {
+          document.getElementById('result').innerHTML = data.html;
+        }
+      })
+      .catch(err => {
+        document.getElementById('result').innerHTML = '🚫 เกิดข้อผิดพลาด: ' + err.message;
+      });
+  }
+</script>
+
 
 </body>
 </html>
