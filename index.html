@@ -43,31 +43,40 @@
   }
 
   function loadAttendance() {
-    const className = document.getElementById('className').value;
-    const dateInput = document.getElementById('date').value;
+  const className = document.getElementById('className').value;
+  const dateInput = document.getElementById('date').value;
 
-    if (!dateInput) {
-      document.getElementById('result').innerHTML = '⚠️ กรุณาเลือกวันที่';
-      return;
-    }
-
-    const dateText = formatDateToThai(dateInput); // แปลงเป็น 13/05/2568
-
-    const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
-
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          document.getElementById('result').innerHTML = `❌ ${data.error}`;
-        } else {
-          document.getElementById('result').innerHTML = data.html;
-        }
-      })
-      .catch(err => {
-        document.getElementById('result').innerHTML = '🚫 เกิดข้อผิดพลาด: ' + err.message;
-      });
+  if (!dateInput) {
+    document.getElementById('result').innerHTML = '⚠️ กรุณาเลือกวันที่';
+    return;
   }
+
+  // ไม่ต้องแปลงวันที่เป็นไทยแล้ว ส่งเป็น YYYY-MM-DD ไปเลย
+  const dateText = dateInput;
+
+  const url = `https://script.google.com/macros/s/AKfycbzmQQdkY4f9aC5NCOw4gK0dYc-Do3cQSgRPlBHyIkxFVIJpjEX8wgyhgU6M6-_jSDwfig/exec?api=true&action=attendance&class=${encodeURIComponent(className)}&date=${encodeURIComponent(dateText)}`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        document.getElementById('result').innerHTML = `❌ ${data.error}`;
+      } else if (data.html) {
+        document.getElementById('result').innerHTML = data.html;
+      } else {
+        document.getElementById('result').innerHTML = '🤔 ไม่พบข้อมูลที่คาดหวัง';
+      }
+    })
+    .catch(error => {
+      document.getElementById('result').innerHTML = '🚫 เกิดข้อผิดพลาด: ' + error.message;
+      console.error('Fetch error:', error); // เพิ่มการ Log ข้อผิดพลาดเพื่อช่วยในการ Debug
+    });
+}
 </script>
 
 
