@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>WebApp2</title>
+</head>
+<body>
+  <h1>ข้อมูลจาก Apps Script</h1>
+  <div id="result">กำลังโหลด...</div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const scriptUrl = urlParams.get('apps');
+
+    if (scriptUrl) {
+      fetch(scriptUrl)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+          document.getElementById('result').innerHTML = 'เกิดข้อผิดพลาด: ' + err.message;
+        });
+    } else {
+      document.getElementById('result').innerHTML = 'ไม่พบพารามิเตอร์ apps';
+    }
+  </script>
+</body>
+</html>
